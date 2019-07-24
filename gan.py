@@ -180,7 +180,7 @@ test_noise = noise(num_test_samples)
 
 # Create logger instance
 logger = Logger(model_name='VGAN', data_name='MNIST')
-
+num_epochs =200
 for epoch in range(num_epochs):
     for n_batch, (real_batch,_) in enumerate(data_loader):
 
