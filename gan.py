@@ -142,3 +142,13 @@ def train_discriminator(optimizer, real_data, fake_data):
     
     # Return error and predictions for real and fake inputs
     return error_real + error_fake, prediction_real, prediction_fake
+
+
+def train_generator(optimizer, fake_data):
+    N = fake_data.size(0)    # Reset gradients
+    optimizer.zero_grad()    # Sample noise and generate fake data
+    prediction = discriminator(fake_data)    # Calculate error and backpropagate
+    error = loss(prediction, ones_target(N))
+    error.backward()    # Update weights with gradients
+    optimizer.step()    # Return error
+    return error
