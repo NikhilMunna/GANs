@@ -152,3 +152,9 @@ def train_generator(optimizer, fake_data):
     error.backward()    # Update weights with gradients
     optimizer.step()    # Return error
     return error
+
+
+#testing
+
+num_test_samples = 16
+test_noise = noise(num_test_samples)
