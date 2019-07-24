@@ -109,3 +109,19 @@ def save_models(self, generator, discriminator, epoch):
     def close(self):
         self.writer.close()
 
+
+# Private Functionality
+
+    @staticmethod
+    def _step(epoch, n_batch, num_batches):
+        return epoch * num_batches + n_batch
+
+    @staticmethod
+    def _make_dir(directory):
+        try:
+            os.makedirs(directory)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
+
+
