@@ -100,3 +100,6 @@ def noise(size):
 
 d_optimizer = optim.Adam(discriminator.parameters(), lr=0.0002)
 g_optimizer = optim.Adam(generator.parameters(), lr=0.0002)
+
+
+loss = nn.BCELoss()
