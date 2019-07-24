@@ -20,3 +20,32 @@ def log(self, d_error, g_error, epoch, n_batch, num_batches):
             '{}/D_error'.format(self.comment), d_error, step)
         self.writer.add_scalar(
             '{}/G_error'.format(self.comment), g_error, step)
+
+
+ def log_images(self, images, num_images, epoch, n_batch, num_batches, format='NCHW', normalize=True):
+        '''
+        input images are expected in format (NCHW)
+        '''
+        if type(images) == np.ndarray:
+            images = torch.from_numpy(images)
+        
+        if format=='NHWC':
+            images = images.transpose(1,3)
+        
+
+        step = Logger._step(epoch, n_batch, num_batches)
+        img_name = '{}/images{}'.format(self.comment, '')
+
+        # Make horizontal grid from image tensor
+        horizontal_grid = vutils.make_grid(
+            images, normalize=normalize, scale_each=True)
+        # Make vertical grid from image tensor
+        nrows = int(np.sqrt(num_images))
+        grid = vutils.make_grid(
+            images, nrow=nrows, normalize=True, scale_each=True)
+
+        # Add horizontal images to tensorboard
+        self.writer.add_image(img_name, horizontal_grid, step)
+
+        # Save plots
+        self.save_torch_images(horizontal_grid, grid, epoch, n_batch)
