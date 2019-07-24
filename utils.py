@@ -7,7 +7,24 @@ from IPython import display
 from matplotlib import pyplot as plt
 import torch
 
-def log(self, d_error, g_error, epoch, n_batch, num_batches):
+'''
+    TensorBoard Data will be stored in './runs' path
+'''
+
+
+class Logger:
+
+    def __init__(self, model_name, data_name):
+        self.model_name = model_name
+        self.data_name = data_name
+
+        self.comment = '{}_{}'.format(model_name, data_name)
+        self.data_subdir = '{}/{}'.format(model_name, data_name)
+
+        # TensorBoard
+        self.writer = SummaryWriter(comment=self.comment)
+
+    def log(self, d_error, g_error, epoch, n_batch, num_batches):
 
         # var_class = torch.autograd.variable.Variable
         if isinstance(d_error, torch.autograd.Variable):
@@ -21,8 +38,7 @@ def log(self, d_error, g_error, epoch, n_batch, num_batches):
         self.writer.add_scalar(
             '{}/G_error'.format(self.comment), g_error, step)
 
-
- def log_images(self, images, num_images, epoch, n_batch, num_batches, format='NCHW', normalize=True):
+    def log_images(self, images, num_images, epoch, n_batch, num_batches, format='NCHW', normalize=True):
         '''
         input images are expected in format (NCHW)
         '''
@@ -50,8 +66,7 @@ def log(self, d_error, g_error, epoch, n_batch, num_batches):
         # Save plots
         self.save_torch_images(horizontal_grid, grid, epoch, n_batch)
 
-
-def save_torch_images(self, horizontal_grid, grid, epoch, n_batch, plot_horizontal=True):
+    def save_torch_images(self, horizontal_grid, grid, epoch, n_batch, plot_horizontal=True):
         out_dir = './data/images/{}'.format(self.data_subdir)
         Logger._make_dir(out_dir)
 
@@ -76,9 +91,8 @@ def save_torch_images(self, horizontal_grid, grid, epoch, n_batch, plot_horizont
         Logger._make_dir(out_dir)
         fig.savefig('{}/{}_epoch_{}_batch_{}.png'.format(out_dir,
                                                          comment, epoch, n_batch))
-                                            
 
-def display_status(self, epoch, num_epochs, n_batch, num_batches, d_error, g_error, d_pred_real, d_pred_fake):
+    def display_status(self, epoch, num_epochs, n_batch, num_batches, d_error, g_error, d_pred_real, d_pred_fake):
         
         # var_class = torch.autograd.variable.Variable
         if isinstance(d_error, torch.autograd.Variable):
@@ -97,8 +111,7 @@ def display_status(self, epoch, num_epochs, n_batch, num_batches, d_error, g_err
         print('Discriminator Loss: {:.4f}, Generator Loss: {:.4f}'.format(d_error, g_error))
         print('D(x): {:.4f}, D(G(z)): {:.4f}'.format(d_pred_real.mean(), d_pred_fake.mean()))
 
-
-def save_models(self, generator, discriminator, epoch):
+    def save_models(self, generator, discriminator, epoch):
         out_dir = './data/models/{}'.format(self.data_subdir)
         Logger._make_dir(out_dir)
         torch.save(generator.state_dict(),
@@ -109,8 +122,7 @@ def save_models(self, generator, discriminator, epoch):
     def close(self):
         self.writer.close()
 
-
-# Private Functionality
+    # Private Functionality
 
     @staticmethod
     def _step(epoch, n_batch, num_batches):
@@ -123,5 +135,3 @@ def save_models(self, generator, discriminator, epoch):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
-
-
