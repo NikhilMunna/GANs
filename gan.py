@@ -95,3 +95,8 @@ def noise(size):
     '''
     n = Variable(torch.randn(size, 100))
     return n
+
+
+
+d_optimizer = optim.Adam(discriminator.parameters(), lr=0.0002)
+g_optimizer = optim.Adam(generator.parameters(), lr=0.0002)
