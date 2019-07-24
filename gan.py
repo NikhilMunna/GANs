@@ -86,3 +86,12 @@ class GeneratorNet(torch.nn.Module):
         x = self.hidden2(x)
         x = self.out(x)
         return xgenerator = GeneratorNet()
+
+
+
+def noise(size):
+    '''
+    Generates a 1-d vector of gaussian sampled random values
+    '''
+    n = Variable(torch.randn(size, 100))
+    return n
