@@ -65,7 +65,8 @@ class DiscriminatorNet(torch.nn.Module):
         x = self.hidden1(x)
         x = self.hidden2(x)
         x = self.out(x)
-        return xdiscriminator = DiscriminatorNet()
+        return x
+discriminator = DiscriminatorNet()
 
 
 
@@ -101,7 +102,8 @@ class GeneratorNet(torch.nn.Module):
         x = self.hidden1(x)
         x = self.hidden2(x)
         x = self.out(x)
-        return xgenerator = GeneratorNet()
+        return x
+generator = GeneratorNet()
 
 
 
@@ -177,29 +179,38 @@ test_noise = noise(num_test_samples)
 
 
 # Create logger instance
-logger = Logger(model_name='VGAN', data_name='MNIST')# Total number of epochs to train
-num_epochs = 200
+logger = Logger(model_name='VGAN', data_name='MNIST')
+
 for epoch in range(num_epochs):
     for n_batch, (real_batch,_) in enumerate(data_loader):
-        N = real_batch.size(0)        # 1. Train Discriminator
-        real_data = Variable(images_to_vectors(real_batch))        # Generate fake data and detach 
-        # (so gradients are not calculated for generator)
-        fake_data = generator(noise(N)).detach()        # Train D
-        d_error, d_pred_real, d_pred_fake = \
-              train_discriminator(d_optimizer, real_data, fake_data)
 
-        # 2. Train Generator        # Generate fake data
-        fake_data = generator(noise(N))        # Train G
-        g_error = train_generator(g_optimizer, fake_data)        # Log batch error
-        logger.log(d_error, g_error, epoch, n_batch, num_batches)        # Display Progress every few batches
-        if (n_batch) % 100 == 0: 
-            test_images = vectors_to_images(generator(test_noise))
-            test_images = test_images.data            logger.log_images(
-                test_images, num_test_samples, 
-                epoch, n_batch, num_batches
-            );
+        # 1. Train Discriminator
+        real_data = Variable(images_to_vectors(real_batch))
+        if torch.cuda.is_available(): real_data = real_data.cuda()
+        # Generate fake data
+        fake_data = generator(noise(real_data.size(0))).detach()
+        # Train D
+        d_error, d_pred_real, d_pred_fake = train_discriminator(d_optimizer,
+                                                                real_data, fake_data)
+
+        # 2. Train Generator
+        # Generate fake data
+        fake_data = generator(noise(real_batch.size(0)))
+        # Train G
+        g_error = train_generator(g_optimizer, fake_data)
+        # Log error
+        logger.log(d_error, g_error, epoch, n_batch, num_batches)
+
+        # Display Progress
+        if (n_batch) % 100 == 0:
+            display.clear_output(True)
+            # Display Images
+            test_images = vectors_to_images(generator(test_noise)).data.cpu()
+            logger.log_images(test_images, num_test_samples, epoch, n_batch, num_batches);
             # Display status Logs
             logger.display_status(
                 epoch, num_epochs, n_batch, num_batches,
                 d_error, g_error, d_pred_real, d_pred_fake
             )
+        # Model Checkpoints
+        logger.save_models(generator, discriminator, epoch)
