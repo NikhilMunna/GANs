@@ -49,3 +49,30 @@ def log(self, d_error, g_error, epoch, n_batch, num_batches):
 
         # Save plots
         self.save_torch_images(horizontal_grid, grid, epoch, n_batch)
+
+
+def save_torch_images(self, horizontal_grid, grid, epoch, n_batch, plot_horizontal=True):
+        out_dir = './data/images/{}'.format(self.data_subdir)
+        Logger._make_dir(out_dir)
+
+        # Plot and save horizontal
+        fig = plt.figure(figsize=(16, 16))
+        plt.imshow(np.moveaxis(horizontal_grid.numpy(), 0, -1))
+        plt.axis('off')
+        if plot_horizontal:
+            display.display(plt.gcf())
+        self._save_images(fig, epoch, n_batch, 'hori')
+        plt.close()
+
+        # Save squared
+        fig = plt.figure()
+        plt.imshow(np.moveaxis(grid.numpy(), 0, -1))
+        plt.axis('off')
+        self._save_images(fig, epoch, n_batch)
+        plt.close()
+
+    def _save_images(self, fig, epoch, n_batch, comment=''):
+        out_dir = './data/images/{}'.format(self.data_subdir)
+        Logger._make_dir(out_dir)
+        fig.savefig('{}/{}_epoch_{}_batch_{}.png'.format(out_dir,
+                                                         comment, epoch, n_batch))
