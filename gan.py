@@ -6,6 +6,12 @@ from utils import Logger
 
 
 
+def images_to_vectors(images):
+    return images.view(images.size(0), 784)
+
+def vectors_to_images(vectors):
+    return vectors.view(vectors.size(0), 1, 28, 28)
+
 
 
 
